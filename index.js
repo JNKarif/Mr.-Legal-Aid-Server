@@ -21,9 +21,9 @@ const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology:
 async function run() {
     try {
         const serviceCollection = client.db('assignment11').collection('services');
-const reviewCollection= client.db('assignment11').collection('reviews')
+        const reviewCollection = client.db('assignment11').collection('reviews');
 
-// creating all services api
+        // creating all services api
         app.get('/services', async (req, res) => {
             const query = {};
             const cursor = serviceCollection.find(query);
@@ -33,18 +33,27 @@ const reviewCollection= client.db('assignment11').collection('reviews')
 
 
         // creating single service api
-        app.get('/services/:id', async(req, res)=>{
-            const id= req.params.id;
-            const query= {_id: ObjectId(id)};
-            const service= await serviceCollection.findOne(query);
+        app.get('/services/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) };
+            const service = await serviceCollection.findOne(query);
             res.send(service)
         });
 
+       
         // reviews api
-        app.post('/reviews', async(req,res)=>{
-            const review= req.body;
-            const result= await reviewCollection.insertOne(review);
+        app.get('/reviews', async (req, res) => {
+            const query = {};
+            const cursor = reviewCollection.find(query);
+            const reviews = await cursor.toArray();
+            res.send(reviews);
+        });
+        
+        app.post('/reviews', async (req, res) => {
+            const review = req.body;
+            const result = await reviewCollection.insertOne(review);
             res.send(result);
+            console.log(result)
         })
     }
     finally {
