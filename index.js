@@ -1,10 +1,10 @@
 const express = require('express');
-const cors= require('cors');
+const cors = require('cors');
 const { MongoClient, ServerApiVersion } = require('mongodb');
 require('dotenv').config();
 
-const app= express();
-const port= process.env.PORT || 5000;
+const app = express();
+const port = process.env.PORT || 5000;
 
 // middle wares
 app.use(cors());
@@ -18,21 +18,28 @@ const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@clu
 // console.log(uri)
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
 
-async function run(){
-try{
-const serviceCollection= client.db('assignment11').collection('services')
-}
-finally{
+async function run() {
+    try {
+        const serviceCollection = client.db('assignment11').collection('services');
 
-}
+        app.get('/services', async (req, res) => {
+            const query = {};
+            const cursor = serviceCollection.find(query);
+            const services = await cursor.toArray();
+            res.send(services)
+        })
+    }
+    finally {
+
+    }
 }
 
-run().catch(err=>console.error(err))
+run().catch(err => console.error(err))
 
-app.get('/', (req, res)=>{
+app.get('/', (req, res) => {
     res.send('assignment-11 sever is running')
 })
 
-app.listen(port, ()=>{
+app.listen(port, () => {
     console.log(`Assignment-11 server is running on ${port} `)
 })
