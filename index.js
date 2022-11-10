@@ -21,6 +21,7 @@ const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology:
 async function run() {
     try {
         const serviceCollection = client.db('assignment11').collection('services');
+        const service3Collection = client.db('assignment11').collection('services3');
         const reviewCollection = client.db('assignment11').collection('reviews');
 
         // creating all services api
@@ -29,6 +30,14 @@ async function run() {
             const cursor = serviceCollection.find(query);
             const services = await cursor.toArray();
             res.send(services)
+        });
+
+        // creating 3 services api
+        app.get('/services3', async (req, res) => {
+            const query = {};
+            const cursor = service3Collection.find(query);
+            const services3 = await cursor.toArray();
+            res.send(services3)
         });
 
 
