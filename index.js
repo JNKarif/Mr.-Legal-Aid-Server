@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const jwt = require('jsonwebtoken')
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 require('dotenv').config();
 
@@ -25,11 +26,21 @@ async function run() {
         const reviewCollection = client.db('assignment11').collection('reviews');
         const AddedServiceCollection = client.db('assignment11').collection('addedservice');
 
+
+        //    JWT 
+        app.post('/jwt', (req, res) => {
+            const user = req.body;
+            // console.log(user)
+            const token= jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {expiresIn:'1h'});
+            res.send({token})
+        })
+
         // creating all services api
         app.get('/services', async (req, res) => {
             const query = {};
             const cursor = serviceCollection.find(query);
             const services = await cursor.toArray();
+            // const services = await cursor.limit(3).toArray();
             res.send(services)
         });
 
@@ -80,18 +91,18 @@ async function run() {
         });
 
         // added service api
-       app.get('/addedservice', async(req, res)=>{
-        let query= {};
-        if (req.query.email) {
-            query = {
-                email: req.query.email
+        app.get('/addedservice', async (req, res) => {
+            let query = {};
+            if (req.query.email) {
+                query = {
+                    email: req.query.email
+                }
             }
-        }
-        const cursor= AddedServiceCollection.find(query);
-        const addedService= await cursor.toArray();
-        res.send(addedService);
-       })
-       
+            const cursor = AddedServiceCollection.find(query);
+            const addedService = await cursor.toArray();
+            res.send(addedService);
+        })
+
         app.post('/addedservice', async (req, res) => {
             const addedService = req.body;
             const result = await AddedServiceCollection.insertOne(addedService);
@@ -99,13 +110,20 @@ async function run() {
             console.log(result)
         });
 
-        
-      
-    //   delete operation
+
+        app.get('/edit/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) };
+            const edit = await reviewCollection.findOne(query);
+            res.send(edit)
+        })
+
+
+        //   delete operation
         app.delete('/reviews/:id', async (req, res) => {
             const id = req.params.id;
             const query = { _id: ObjectId(id) };
-            const result= await reviewCollection.deleteOne(query);
+            const result = await reviewCollection.deleteOne(query);
             res.send(result);
         })
     }
