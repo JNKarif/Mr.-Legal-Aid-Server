@@ -31,8 +31,8 @@ async function run() {
         app.post('/jwt', (req, res) => {
             const user = req.body;
             // console.log(user)
-            const token= jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {expiresIn:'1h'});
-            res.send({token})
+            const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '1h' });
+            res.send({ token })
         })
 
         // creating all services api
@@ -116,6 +116,23 @@ async function run() {
             const query = { _id: ObjectId(id) };
             const edit = await reviewCollection.findOne(query);
             res.send(edit)
+        })
+
+
+
+        //update or edit
+        app.put('/edit/:id', async (req, res) => {
+            const id = req.params.id;
+            const filter = { _id: ObjectId(id) };
+            const user = req.body;
+            const option = { upsert: true };
+            const edited = {
+                $set: {
+                    message: user.message
+                }
+            }
+            const result = await reviewCollection.updateOne(filter, edited, option)
+            res.send(result)
         })
 
 
