@@ -23,6 +23,7 @@ async function run() {
         const serviceCollection = client.db('assignment11').collection('services');
         const service3Collection = client.db('assignment11').collection('services3');
         const reviewCollection = client.db('assignment11').collection('reviews');
+        const AddedServiceCollection = client.db('assignment11').collection('addedservice');
 
         // creating all services api
         app.get('/services', async (req, res) => {
@@ -50,6 +51,14 @@ async function run() {
         });
 
 
+        app.get('/services3/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) };
+            const service1 = await service3Collection.findOne(query);
+            res.send(service1)
+        });
+
+
         // reviews api
         app.get('/reviews', async (req, res) => {
             let query = {};
@@ -70,6 +79,29 @@ async function run() {
             console.log(result)
         });
 
+        // added service api
+       app.get('/addedservice', async(req, res)=>{
+        let query= {};
+        if (req.query.email) {
+            query = {
+                email: req.query.email
+            }
+        }
+        const cursor= AddedServiceCollection.find(query);
+        const addedService= await cursor.toArray();
+        res.send(addedService);
+       })
+       
+        app.post('/addedservice', async (req, res) => {
+            const addedService = req.body;
+            const result = await AddedServiceCollection.insertOne(addedService);
+            res.send(result);
+            console.log(result)
+        });
+
+        
+      
+    //   delete operation
         app.delete('/reviews/:id', async (req, res) => {
             const id = req.params.id;
             const query = { _id: ObjectId(id) };
